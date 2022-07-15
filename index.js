@@ -1,11 +1,16 @@
-export * from './src/lib/json-api.module';
-export * from './src/lib/constants/reflection';
-export * from './src/lib/json-api.module';
-export * from './src/lib/decorators';
-export * from './src/lib/constants';
-export * from './src/lib/helpers';
-export * from './src/lib/types';
-export * from './src/lib/mixins';
-export { SwaggerService } from './src/lib/services/swagger/swagger.service';
-export { excludeMethod } from './src/lib/config/bindings';
-//# sourceMappingURL=index.js.map
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.excludeMethod = exports.SwaggerService = void 0;
+const tslib_1 = require("tslib");
+(0, tslib_1.__exportStar)(require("./src/lib/json-api.module"), exports);
+(0, tslib_1.__exportStar)(require("./src/lib/constants/reflection"), exports);
+(0, tslib_1.__exportStar)(require("./src/lib/json-api.module"), exports);
+(0, tslib_1.__exportStar)(require("./src/lib/decorators"), exports);
+(0, tslib_1.__exportStar)(require("./src/lib/constants"), exports);
+(0, tslib_1.__exportStar)(require("./src/lib/helpers"), exports);
+(0, tslib_1.__exportStar)(require("./src/lib/types"), exports);
+(0, tslib_1.__exportStar)(require("./src/lib/mixins"), exports);
+var swagger_service_1 = require("./src/lib/services/swagger/swagger.service");
+Object.defineProperty(exports, "SwaggerService", { enumerable: true, get: function () { return swagger_service_1.SwaggerService; } });
+var bindings_1 = require("./src/lib/config/bindings");
+Object.defineProperty(exports, "excludeMethod", { enumerable: true, get: function () { return bindings_1.excludeMethod; } });
