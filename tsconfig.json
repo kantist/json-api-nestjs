@@ -1,9 +1,7 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
-		"baseUrl": "tsconfig",
-		"rootDir": "src/",
-		"outDir": ".",
+		"rootDir": ".",
 		"sourceMap": true,
 		"declaration": false,
 		"moduleResolution": "node",
@@ -15,7 +13,8 @@
 		"lib": ["es2017", "dom"],
 		"skipLibCheck": true,
 		"skipDefaultLibCheck": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"baseUrl": "."
 	},
 	"exclude": ["node_modules", "tmp"]
 }
