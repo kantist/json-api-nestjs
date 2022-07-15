@@ -473,7 +473,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 					const bodyParams = body as BaseData[];
 					currentData.forEach((item) => {
 						bodyParams.forEach((body) => {
-							if (body.attributes && parseInt(item[propertyName], 10) === parseInt(body.id, 10)) {
+							if (body.attributes && item[propertyName] === body.id) {
 								Object.entries(body.attributes).forEach(([key, val]) => {
 									item[key] = val;
 								});
@@ -578,7 +578,7 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 				const bodyParams = body as BaseData[];
 				currentData.forEach((item) => {
 					bodyParams.forEach((body) => {
-						if (body.attributes && parseInt(item[propertyName], 10) === parseInt(body.id, 10)) {
+						if (body.attributes && item[propertyName] === body.id) {
 							Object.entries(body.attributes).forEach(([key, val]) => {
 								item[key] = val;
 							});
