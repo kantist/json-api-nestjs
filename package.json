@@ -21,9 +21,6 @@
 	},
 	"private": false,
 	"license": "MIT",
-	"files": [
-		"src/**"
-	],
 	"keywords": [
 		"nestjs",
 		"nest",

@@ -4,6 +4,9 @@
 /dist
 /tmp
 /out-tsc
+/lib
+/index.js
+/index.js.map
 src/**/*.js
 src/**/*.js.map
 
