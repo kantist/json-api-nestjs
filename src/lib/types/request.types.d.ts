@@ -30,9 +30,9 @@ export interface QueryParams {
     needAttribute?: boolean;
 }
 export interface RouteParams {
-    id?: number;
+    id?: string;
     relName?: string;
-    relId?: number;
+    relId?: string;
 }
 export declare type RequestRelationshipsData = RequestRelationshipsObject['data'];
 export declare type RequestResourceData = RequestResourceObject['data'];
