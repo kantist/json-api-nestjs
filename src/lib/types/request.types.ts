@@ -38,9 +38,9 @@ export interface QueryParams {
 }
 
 export interface RouteParams {
-  id?: number;
+  id?: string;
   relName?: string;
-  relId?: number;
+  relId?: string;
 }
 
 export type RequestRelationshipsData = RequestRelationshipsObject['data'];

@@ -1,6 +1,6 @@
 {
 	"name": "@kantist/json-api-nestjs",
-	"version": "0.0.19",
+	"version": "0.0.20",
 	"scripts": {
 		"build": "tsc -p tsconfig.json",
 		"build:watch": "tsc -p tsconfig.json --watch",

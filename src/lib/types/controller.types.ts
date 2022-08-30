@@ -20,7 +20,7 @@ export type controllerMethod =
 
 export type getOneMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   params: QueryParams,
   ...rest: any[]
 ) => Promise<any>;
@@ -33,16 +33,16 @@ export type getAllMethod = (
 
 export type getDirectOneMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   relName: string,
-  relId: number,
+  relId: string,
   params: QueryParams,
   ...rest: any[]
 ) => Promise<any>;
 
 export type getDirectAllMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   relName: string,
   params: QueryParams,
   ...rest: any[]
@@ -50,21 +50,21 @@ export type getDirectAllMethod = (
 
 export type getRelationshipMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   relName: string,
   ...rest: any[]
 ) => Promise<any>;
 
 export type patchOneMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   body: RequestResourceData,
   ...rest: any[]
 ) => Promise<any>;
 
 export type patchRelationshipMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   relName: string,
   body: RequestRelationshipsData,
   ...rest: any[]
@@ -78,7 +78,7 @@ export type postOneMethod = (
 
 export type postRelationshipMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   relName: string,
   body: RequestRelationshipsData,
   ...rest: any[]
@@ -86,13 +86,13 @@ export type postRelationshipMethod = (
 
 export type deleteOneMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   ...rest: any[]
 ) => Promise<void>;
 
 export type deleteRelationshipMethod = (
   this: JsonApiController,
-  id: number,
+  id: string,
   relName: string,
   body: RequestRelationshipsData,
   ...rest: any[]
