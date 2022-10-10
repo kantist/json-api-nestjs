@@ -13,6 +13,7 @@ import {
 	JsonApiService,
 	JsonApiTransform,
 	OperandsMap,
+	QueryField,
 	RepositoryMixin,
 	RequestRelationshipsData,
 	RequestResourceData,
@@ -25,11 +26,12 @@ import {
 } from '../../types';
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
 
-export function serviceMixin(entity: Entity, transform: TransformMixin, connectionName: string): ServiceMixin {
+export function serviceMixin(entity: Entity, transform: TransformMixin, connectionName: string, tenantId: string): ServiceMixin {
 	@Injectable()
 	class MixinService implements JsonApiService {
 		@InjectRepository(entity, connectionName) protected repository: RepositoryMixin;
 		@Inject(transform) protected transform: JsonApiTransform;
+		@Inject(tenantId) private tenantId: string;		
 
 		public async getRelationship(options: ServiceOptions<void>): Promise<ResponseRelationshipsObject> {
 			const mainResourceName = paramCase(this.repository.metadata.name);
@@ -176,6 +178,11 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 		}
 
 		public async getDirectAll(options: ServiceOptions<void>): Promise<ResponseResourceObject> {
+
+			console.log("----jsonapi service get direct all----");
+			console.log(this.tenantId);
+			
+
 			const mainResourceName = paramCase(this.repository.metadata.name);
 			const { include, sort, filter, page } = options.query;
 			const { id, relName } = options.route;
@@ -312,6 +319,20 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 		}
 
 		public async getAll(options: ServiceOptions<void>): Promise<ResponseResourceObject> {
+			console.log("----jsonapi service----");
+			// console.log('tenant id   ' + this.tenantId);
+
+
+			// console.log("----service options----");
+
+			// console.log("----filter before----");
+			// console.log(options.query['filter']);
+
+			// options.query['filter']['tenantId'] = {eq: this.tenantId };
+
+			// console.log("----filter after----");
+			// console.log(options.query['filter']);
+			
 			const preparedResourceName = paramCase(this.repository.metadata.name);
 			const builder = this.repository.createQueryBuilder(preparedResourceName);
 			const { include, filter, sort, page } = options.query;
@@ -775,7 +796,21 @@ export function serviceMixin(entity: Entity, transform: TransformMixin, connecti
 			const preparedResourceName = paramCase(metadata.name);
 			const relations = metadata.relations.map((item) => item.propertyName);
 
+
+			console.log('--apply filter--');
+			console.log('--apply filter before--');
+			console.log(filters);
+			console.log(filters['tenantId'] = {eq: this.tenantId });
+			console.log('--apply filter after--');
+			console.log(filters);
+
 			Object.entries(filters).forEach(([field, condition], i) => {
+
+				console.log('--field--');
+				console.log(field);
+				console.log('--condition--');
+				console.log(condition);
+				
 				const type = i === 0 ? 'where' : 'andWhere';
 				const operand = Object.keys(condition).pop();
 				const paramName = `params_${i}`;

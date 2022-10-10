@@ -51,6 +51,7 @@ export class JsonApiModule implements OnModuleInit {
 		const { globalPrefix } = options;
 		const optionsProviders = options.providers || [];
 		const optionsImports = options.imports || [];
+		const tenantId = options.tenantId;
 		JsonApiModule.connectionName = options.connectionName || JsonApiModule.connectionName;
 
 		const moduleParams: DynamicModule = {
@@ -97,7 +98,7 @@ export class JsonApiModule implements OnModuleInit {
 			const controller = (options.controllers || []).find(
 				(item) => Reflect.getMetadata(JSON_API_ENTITY, item) === entity
 			);
-			const module = moduleMixin(globalPrefix, controller, entity, JsonApiModule.connectionName);
+			const module = moduleMixin(globalPrefix, controller, entity, JsonApiModule.connectionName, tenantId);
 
 			moduleParams.controllers = [...moduleParams.controllers, module.controller];
 			moduleParams.providers = [...moduleParams.providers, ...module.providers];

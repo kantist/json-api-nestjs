@@ -11,12 +11,13 @@ export function moduleMixin(
 	globalPrefix: ModuleOptions['globalPrefix'],
 	controller: NestController,
 	entity: Entity,
-	connectionName: string
+	connectionName: string,
+	tenantId: ModuleOptions['tenantId']
 ) {
 	const entityName = entity instanceof Function ? entity.name : entity.options.name;
 	const builtController = controller || class ControllerMixin {};
 	const builtTransform = transformMixin(entity, connectionName);
-	const builtService = serviceMixin(entity, builtTransform, connectionName);
+	const builtService = serviceMixin(entity, builtTransform, connectionName, tenantId);
 
 	Controller(`${globalPrefix}/${paramCase(entityName)}`)(builtController);
 	Inject(builtService)(builtController.prototype, 'serviceMixin');

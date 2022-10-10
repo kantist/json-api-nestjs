@@ -23,6 +23,7 @@ export interface ModuleOptions {
     swagger?: SwaggerConfig;
     providers?: NestProvider[];
     connectionName?: string;
+    tenantId?: string;
 }
 export interface ModuleConfig {
     globalPrefix: string;
