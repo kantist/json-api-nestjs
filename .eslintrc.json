@@ -32,7 +32,7 @@
 				" * Copyright Kant Yazılım A.Ş. All Rights Reserved.",
 				" *",
 				" * Use of this source code is governed by an MIT-style license that can be",
-				" * found in the LICENSE file at https://rilke.ist/license",
+				" * found in the LICENSE file at https://clara.ist/license",
 				" "
 			],
 			2
@@ -102,13 +102,14 @@
 		"@typescript-eslint/require-await": "off",
 		"@typescript-eslint/restrict-plus-operands": "off",
 		"@typescript-eslint/restrict-template-expressions": "off",
-		"@typescript-eslint/unbound-method": "off"
+		"@typescript-eslint/unbound-method": "off",
+		"@typescript-eslint/no-explicit-any": "off"
 	},
 	"overrides": [
 		{
 			"files": ["!packages/**", "**/*_spec.ts"],
 			"rules": {
-				"indent": ["error", "tab"],
+				"indent": ["error", "tab", { "SwitchCase": 1 }],
 				"import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
 				"max-lines-per-function": "off",
 				"no-console": "off"

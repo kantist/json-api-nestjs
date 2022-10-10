@@ -1,16 +1,18 @@
 "use strict";
+/**
+ * @license
+ * Copyright Kant Yazılım A.Ş. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://clara.ist/license
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.excludeMethod = exports.SwaggerService = void 0;
+exports.excludeMethod = void 0;
 const tslib_1 = require("tslib");
-(0, tslib_1.__exportStar)(require("./src/lib/json-api.module"), exports);
-(0, tslib_1.__exportStar)(require("./src/lib/constants/reflection"), exports);
-(0, tslib_1.__exportStar)(require("./src/lib/json-api.module"), exports);
-(0, tslib_1.__exportStar)(require("./src/lib/decorators"), exports);
-(0, tslib_1.__exportStar)(require("./src/lib/constants"), exports);
-(0, tslib_1.__exportStar)(require("./src/lib/helpers"), exports);
-(0, tslib_1.__exportStar)(require("./src/lib/types"), exports);
-(0, tslib_1.__exportStar)(require("./src/lib/mixins"), exports);
-var swagger_service_1 = require("./src/lib/services/swagger/swagger.service");
-Object.defineProperty(exports, "SwaggerService", { enumerable: true, get: function () { return swagger_service_1.SwaggerService; } });
+tslib_1.__exportStar(require("./src/lib/json-api.module"), exports);
+tslib_1.__exportStar(require("./src/lib/decorators"), exports);
 var bindings_1 = require("./src/lib/config/bindings");
 Object.defineProperty(exports, "excludeMethod", { enumerable: true, get: function () { return bindings_1.excludeMethod; } });
+tslib_1.__exportStar(require("./src/lib/types"), exports);
+tslib_1.__exportStar(require("./src/lib/types-common"), exports);
+tslib_1.__exportStar(require("./src/lib/mixin/controller"), exports);

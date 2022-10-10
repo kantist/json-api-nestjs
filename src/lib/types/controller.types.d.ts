@@ -1,27 +1,24 @@
-import { RequestRelationshipsData, RequestResourceData, JsonApiService, QueryParams } from '.';
-export declare type controllerMethod = getOneMethod | getAllMethod | getDirectOneMethod | getDirectAllMethod | getRelationshipMethod | patchOneMethod | patchRelationshipMethod | postOneMethod | postRelationshipMethod | deleteOneMethod | deleteRelationshipMethod;
-export declare type getOneMethod = (this: JsonApiController, id: string, params: QueryParams, ...rest: any[]) => Promise<any>;
-export declare type getAllMethod = (this: JsonApiController, query: QueryParams, ...rest: any[]) => Promise<any>;
-export declare type getDirectOneMethod = (this: JsonApiController, id: string, relName: string, relId: string, params: QueryParams, ...rest: any[]) => Promise<any>;
-export declare type getDirectAllMethod = (this: JsonApiController, id: string, relName: string, params: QueryParams, ...rest: any[]) => Promise<any>;
-export declare type getRelationshipMethod = (this: JsonApiController, id: string, relName: string, ...rest: any[]) => Promise<any>;
-export declare type patchOneMethod = (this: JsonApiController, id: string, body: RequestResourceData, ...rest: any[]) => Promise<any>;
-export declare type patchRelationshipMethod = (this: JsonApiController, id: string, relName: string, body: RequestRelationshipsData, ...rest: any[]) => Promise<void>;
-export declare type postOneMethod = (this: JsonApiController, body: RequestResourceData, ...rest: any[]) => Promise<any>;
-export declare type postRelationshipMethod = (this: JsonApiController, id: string, relName: string, body: RequestRelationshipsData, ...rest: any[]) => Promise<void>;
-export declare type deleteOneMethod = (this: JsonApiController, id: string, ...rest: any[]) => Promise<void>;
-export declare type deleteRelationshipMethod = (this: JsonApiController, id: string, relName: string, body: RequestRelationshipsData, ...rest: any[]) => Promise<void>;
-export interface JsonApiController {
-    serviceMixin?: JsonApiService;
-    getOne?: getOneMethod;
-    getAll?: getAllMethod;
-    getDirectOne?: getDirectOneMethod;
-    getDirectAll?: getDirectAllMethod;
-    getRelationship?: getRelationshipMethod;
-    patchOne?: patchOneMethod;
-    patchRelationship?: patchRelationshipMethod;
-    postOne?: postOneMethod;
-    postRelationship?: postRelationshipMethod;
-    deleteOne?: deleteOneMethod;
-    deleteRelationship?: deleteRelationshipMethod;
+/**
+ * @license
+ * Copyright Kant Yazılım A.Ş. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://clara.ist/license
+ */
+
+import { Relationship, ResourceRequestObject } from '../types-common';
+import { QueryParams } from './query.types';
+import { JsonApiServiceMethode } from './service.types';
+
+export interface ControllerTypes<Entity> {
+    serviceMixin: JsonApiServiceMethode<Entity>;
+    getAll: (query: QueryParams<Entity>, ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['getAll']>;
+    getOne: (id: number, query: QueryParams<Entity>, ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['getOne']>;
+    deleteOne: (id: number, ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['deleteOne']>;
+    postOne: (body: ResourceRequestObject<Entity>['data'], ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['postOne']>;
+    patchOne: (id: number, body: ResourceRequestObject<Entity>['data'], ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['patchOne']>;
+    getRelationship: (id: number, relName: string, ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['getRelationship']>;
+    deleteRelationship: (id: number, relName: string, body: Exclude<Relationship<Entity>['data'], 'links'>, ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['deleteRelationship']>;
+    postRelationship: (id: number, relName: string, body: Exclude<Relationship<Entity>['data'], 'links'>, ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['postRelationship']>;
+    patchRelationship: (id: number, relName: string, body: Exclude<Relationship<Entity>['data'], 'links'>, ...rest: any[]) => ReturnType<JsonApiServiceMethode<Entity>['patchRelationship']>;
 }

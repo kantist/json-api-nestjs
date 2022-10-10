@@ -1,115 +1,53 @@
-import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { HttpAdapterHost, ModuleRef } from '@nestjs/core';
-import * as swaggerUi from 'swagger-ui-express';
+/**
+ * @license
+ * Copyright Kant Yazılım A.Ş. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://clara.ist/license
+ */
 
-import { SwaggerService } from './services/swagger/swagger.service';
-import { DEFAULT_CONNECTION_NAME, JSON_API_CONFIG, JSON_API_ENTITY } from './constants';
-import { CustomRouteObject, Entity, MethodName, ModuleConfig, ModuleOptions, NestController } from './types';
-import { moduleMixin } from './mixins';
 
-import { DECORATORS } from '@nestjs/swagger/dist/constants';
+import { DynamicModule, Module } from '@nestjs/common';
+
+import { ConfigParamDefault, DEFAULT_CONNECTION_NAME, JSON_API_DECORATOR_ENTITY } from '../lib/constants';
+import { BaseModuleClass } from '../lib/mixin';
+import { ModuleOptions } from '../lib/types';
+import { JsonApiNestJsCommonModule } from './json-api-nestjs-common.module';
 
 @Module({})
-export class JsonApiModule implements OnModuleInit {
+export class JsonApiModule {
 	private static connectionName = DEFAULT_CONNECTION_NAME;
 
-	public constructor(protected moduleRef: ModuleRef, protected adapterHost: HttpAdapterHost) {}
-
-	public onModuleInit(): void {
-		(SwaggerService.getEntities() as { name: string }[]).forEach(async (entity) => {
-			const repoName =
-				JsonApiModule.connectionName === DEFAULT_CONNECTION_NAME
-					? `${entity.name}Repository`
-					: `${JsonApiModule.connectionName}_${entity.name}Repository`;
-
-			const repository = this.moduleRef.get(repoName, { strict: false });
-			SwaggerService.addResourceConfig(repository.metadata);
-		});
-		const config = SwaggerService.getConfig();
-
-		if (!config.hideSwaggerRoute) {
-			const document = SwaggerService.prepareDocument();
-			const { httpAdapter } = this.adapterHost;
-
-			const swaggerHtml = swaggerUi.generateHTML(document, {});
-			httpAdapter.get(`/${config.prefix}`, (req, res) => res.send(swaggerHtml));
-			httpAdapter.use(
-				`/${config.prefix}`,
-				swaggerUi.serveFiles(document, {
-					swaggerOptions: {
-						// oauth: {
-						//   usePkceWithAuthorizationCodeGrant: true
-						// }
-					},
-				})
-			);
-		}
-	}
-
 	public static forRoot(options: ModuleOptions): DynamicModule {
-		const { globalPrefix } = options;
-		const optionsProviders = options.providers || [];
-		const optionsImports = options.imports || [];
 		JsonApiModule.connectionName = options.connectionName || JsonApiModule.connectionName;
 
-		const moduleParams: DynamicModule = {
-			module: JsonApiModule,
-			controllers: [],
-			providers: [
-				...optionsProviders,
-				{
-					provide: JSON_API_CONFIG,
-					useValue: {
-						globalPrefix,
-					} as ModuleConfig,
-				},
-			],
-			imports: [TypeOrmModule.forFeature(options.entities, JsonApiModule.connectionName), ...optionsImports],
+		options.connectionName = JsonApiModule.connectionName;
+		options.options = {
+			...ConfigParamDefault,
+			...options.options,
 		};
 
-		const swaggerOptions = options.swagger || {};
-		SwaggerService.setConfig({
-			...swaggerOptions,
-			apiPrefix: swaggerOptions.apiPrefix || globalPrefix,
-		});
-
-		const getCustomRoutes = (controller: NestController, entity: Entity): CustomRouteObject[] => {
-			if (!controller || !Reflect.hasOwnMetadata(DECORATORS.API_TAGS, controller)) {
-				return;
-			}
-
-			const methodNames = Object.getOwnPropertyNames(controller.prototype).filter((methodName) =>
-				Reflect.hasOwnMetadata(DECORATORS.API_RESPONSE, controller.prototype[methodName])
-			) as MethodName[];
-			const entityName = entity instanceof Function ? entity.name : entity.options.name;
-
-			return methodNames.map((methodName) => {
-				const path = Reflect.getMetadata('path', controller.prototype[methodName]);
-				const method = Reflect.getMetadata('method', controller.prototype[methodName]);
-				const response = Reflect.getMetadata(DECORATORS.API_RESPONSE, controller.prototype[methodName]);
-				const operation = Reflect.getMetadata(DECORATORS.API_OPERATION, controller.prototype[methodName]);
-				return { path, method, response, operation, entityName, methodName };
-			});
-		};
-
-		options.entities.forEach((entity) => {
+		const entityImport = options.entities.map((entity) => {
 			const controller = (options.controllers || []).find(
-				(item) => Reflect.getMetadata(JSON_API_ENTITY, item) === entity
+				(item) => Reflect.getMetadata(JSON_API_DECORATOR_ENTITY, item) === entity
 			);
-			const module = moduleMixin(globalPrefix, controller, entity, JsonApiModule.connectionName);
+			const module = BaseModuleClass.forRoot({
+				entity,
+				connectionName: JsonApiModule.connectionName,
+				controller,
+				config: {
+					...ConfigParamDefault,
+					...options.options,
+				},
+			});
+			module.imports = [...module.imports, JsonApiNestJsCommonModule.forRoot(options)];
 
-			moduleParams.controllers = [...moduleParams.controllers, module.controller];
-			moduleParams.providers = [...moduleParams.providers, ...module.providers];
-
-			const customRoutes = getCustomRoutes(controller, entity);
-			if (customRoutes) {
-				SwaggerService.customRoutes.push(...customRoutes);
-			}
-
-			SwaggerService.addEntity(entity);
+			return module;
 		});
-		// console.log(moduleParams)
-		return moduleParams;
+
+		return {
+			module: JsonApiModule,
+			imports: [...entityImport],
+		};
 	}
 }

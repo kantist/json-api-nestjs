@@ -1,11 +1,15 @@
-import { DynamicModule, OnModuleInit } from '@nestjs/common';
-import { HttpAdapterHost, ModuleRef } from '@nestjs/core';
-import { ModuleOptions } from './types';
-export declare class JsonApiModule implements OnModuleInit {
-    protected moduleRef: ModuleRef;
-    protected adapterHost: HttpAdapterHost;
-    private static connectionName;
-    constructor(moduleRef: ModuleRef, adapterHost: HttpAdapterHost);
-    onModuleInit(): void;
-    static forRoot(options: ModuleOptions): DynamicModule;
+/**
+ * @license
+ * Copyright Kant Yazılım A.Ş. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://clara.ist/license
+ */
+
+import { DynamicModule } from '@nestjs/common';
+import { ModuleOptions } from '../lib/types';
+
+export declare class JsonApiModule {
+	private static connectionName;
+	static forRoot(options: ModuleOptions): DynamicModule;
 }

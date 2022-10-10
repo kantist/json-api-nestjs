@@ -1,32 +1,57 @@
+/**
+ * @license
+ * Copyright Kant Yazılım A.Ş. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://clara.ist/license
+ */
+
+
 import { RequestMethod } from '@nestjs/common';
+import { ObjectLiteral } from 'typeorm/common/ObjectLiteral';
 
-import { controllerMethod, PipeFabric } from '.';
-
-export type BindingsConfig = {
-  [key in MethodName]: Binding;
-};
-
-export interface Binding {
-  path: string;
-  method: RequestMethod;
-  name: MethodName;
-  implementation: controllerMethod;
-  parameters: {
-    decorator: Function;
-    property?: string;
-    mixins: PipeFabric[];
-  }[]
-}
+import { ControllerTypes } from './controller.types';
+import { PipeFabric } from './module.types';
 
 export type MethodName =
   | 'getAll'
   | 'getOne'
   | 'getRelationship'
-  | 'getDirectAll'
-  | 'getDirectOne'
+  // | 'getDirectAll'
+  // | 'getDirectOne'
   | 'deleteOne'
   | 'deleteRelationship'
   | 'postOne'
   | 'postRelationship'
   | 'patchOne'
   | 'patchRelationship';
+
+type MapNameToTypeMethod = {
+  getAll: RequestMethod.GET;
+  // getDirectAll: RequestMethod.GET,
+  // getDirectOne: RequestMethod.GET,
+  getOne: RequestMethod.GET;
+  patchOne: RequestMethod.PATCH;
+  patchRelationship: RequestMethod.PATCH;
+  postOne: RequestMethod.POST;
+  postRelationship: RequestMethod.POST;
+  deleteOne: RequestMethod.DELETE;
+  deleteRelationship: RequestMethod.DELETE;
+  getRelationship: RequestMethod.GET;
+};
+
+export interface Binding<T extends MethodName> {
+  path: string;
+  method: MapNameToTypeMethod[T];
+  name: T;
+  implementation: ControllerTypes<any>[T];
+  parameters: {
+    decorator: ParameterDecorator;
+    property?: string;
+    mixins: PipeFabric[];
+  }[];
+}
+
+export type BindingsConfig = {
+  [Key in MethodName]: Binding<Key>;
+};

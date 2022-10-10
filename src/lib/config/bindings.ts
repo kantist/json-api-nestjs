@@ -1,76 +1,51 @@
-import { Body, Param, Query, RequestMethod } from '@nestjs/common';
+/**
+ * @license
+ * Copyright Kant Yazılım A.Ş. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://clara.ist/license
+ */
 
-import { BindingsConfig, JsonApiController, MethodName } from '../types';
+
 import {
-	bodyDeleteRelationshipMixin,
-	parseRelationshipNameMixin,
-	bodyPatchRelationshipMixin,
-	bodyPostRelationshipMixin,
-	parseResourceIdMixin,
-	querySchemaMixin,
-	queryParamsMixin,
-	queryNeedAttributeMixin,
-	bodyPatchMixin,
-	bodyPostMixin,
-	paramsEscapeMixin,
-} from '../mixins';
-import { PARAMS_RELATION_NAME, PARAMS_RELATION_ID, PARAMS_RESOURCE_ID } from '../constants/reflection';
+	Body,
+	Param,
+	ParseIntPipe,
+	Query,
+	RequestMethod,
+} from '@nestjs/common';
 
-export const Bindings: BindingsConfig = {
-	deleteOne: {
-		method: RequestMethod.DELETE,
-		path: `:${PARAMS_RESOURCE_ID}`,
-		name: 'deleteOne',
-		implementation: function (id) {
-			return this.serviceMixin.deleteOne({ route: { id } });
-		} as JsonApiController['deleteOne'],
-		parameters: [
-			{
-				property: PARAMS_RESOURCE_ID,
-				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-		],
-	},
-	deleteRelationship: {
-		method: RequestMethod.DELETE,
-		name: 'deleteRelationship',
-		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
-		implementation: async function (id, relName, body) {
-			return this.serviceMixin.deleteRelationship({
-				route: { id, relName },
-				body,
-			});
-		} as JsonApiController['deleteRelationship'],
-		parameters: [
-			{
-				property: PARAMS_RESOURCE_ID,
-				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-			{
-				property: PARAMS_RELATION_NAME,
-				decorator: Param,
-				mixins: [parseRelationshipNameMixin],
-			},
-			{
-				property: 'data',
-				decorator: Body,
-				mixins: [bodyDeleteRelationshipMixin],
-			},
-		],
-	},
+import { PARAMS_RELATION_NAME, PARAMS_RESOURCE_ID } from '../constants';
+import { JsonBaseController } from '../mixin';
+import {
+	bodyInputPatchPipeMixin,
+	bodyInputPostMixin,
+	bodyRelationshipPatchPipeMixin,
+	bodyRelationshipPipeMixin,
+	parseRelationshipNameMixin,
+	queryFiledInIncludeMixin,
+	querySchemaMixin,
+	queryTransformMixin,
+	queryTransformSchemaMixin,
+} from '../mixin/pipes';
+import { BindingsConfig, MethodName } from '../types';
+
+
+const Bindings: BindingsConfig = {
 	getAll: {
 		method: RequestMethod.GET,
 		name: 'getAll',
 		path: '',
-		implementation: async function (query) {
-			return this.serviceMixin.getAll({ query });
-		} as JsonApiController['getAll'],
+		implementation: JsonBaseController.prototype['getAll'],
 		parameters: [
 			{
 				decorator: Query,
-				mixins: [querySchemaMixin, queryParamsMixin, paramsEscapeMixin],
+				mixins: [
+					querySchemaMixin,
+					queryTransformMixin,
+					queryTransformSchemaMixin,
+					queryFiledInIncludeMixin,
+				],
 			},
 		],
 	},
@@ -78,158 +53,34 @@ export const Bindings: BindingsConfig = {
 		method: RequestMethod.GET,
 		name: 'getOne',
 		path: `:${PARAMS_RESOURCE_ID}`,
-		implementation: async function (id, query) {
-			return this.serviceMixin.getOne({
-				route: { id },
-				query,
-			});
-		} as JsonApiController['getOne'],
+		implementation: JsonBaseController.prototype['getOne'],
 		parameters: [
 			{
 				property: PARAMS_RESOURCE_ID,
 				decorator: Param,
-				mixins: [parseResourceIdMixin],
+				mixins: [() => ParseIntPipe],
 			},
 			{
 				decorator: Query,
-				mixins: [querySchemaMixin, queryParamsMixin],
+				mixins: [
+					querySchemaMixin,
+					queryTransformMixin,
+					queryTransformSchemaMixin,
+					queryFiledInIncludeMixin,
+				],
 			},
 		],
 	},
-	getRelationship: {
-		method: RequestMethod.GET,
-		name: 'getRelationship',
-		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
-		implementation: async function (id, relName, query) {
-			return this.serviceMixin.getRelationship({
-				route: { id, relName },
-				query,
-			});
-		} as JsonApiController['getRelationship'],
-		parameters: [
-			{
-				property: PARAMS_RESOURCE_ID,
-				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-			{
-				property: PARAMS_RELATION_NAME,
-				decorator: Param,
-				mixins: [parseRelationshipNameMixin],
-			},
-			{
-				decorator: Query,
-				mixins: [queryNeedAttributeMixin],
-			},
-		],
-	},
-	getDirectOne: {
-		method: RequestMethod.GET,
-		name: 'getDirectOne',
-		path: `:${PARAMS_RESOURCE_ID}/:${PARAMS_RELATION_NAME}/:${PARAMS_RELATION_ID}`,
-		implementation: async function (id, relName, relId, query) {
-			return this.serviceMixin.getDirectOne({
-				route: { id, relName, relId },
-				query,
-			});
-		} as JsonApiController['getDirectOne'],
-		parameters: [
-			{
-				property: PARAMS_RESOURCE_ID,
-				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-			{
-				property: PARAMS_RELATION_NAME,
-				decorator: Param,
-				mixins: [parseRelationshipNameMixin],
-			},
-			{
-				property: PARAMS_RELATION_ID,
-				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-			{
-				decorator: Query,
-				mixins: [querySchemaMixin, queryParamsMixin],
-			},
-		],
-	},
-	getDirectAll: {
-		method: RequestMethod.GET,
-		name: 'getDirectAll',
-		path: `:${PARAMS_RESOURCE_ID}/:${PARAMS_RELATION_NAME}`,
-		implementation: async function (id, relName, query) {
-			return this.serviceMixin.getDirectAll({
-				route: { id, relName },
-				query,
-			});
-		} as JsonApiController['getDirectAll'],
-		parameters: [
-			{
-				property: PARAMS_RESOURCE_ID,
-				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-			{
-				property: PARAMS_RELATION_NAME,
-				decorator: Param,
-				mixins: [parseRelationshipNameMixin],
-			},
-			{
-				decorator: Query,
-				mixins: [querySchemaMixin, queryParamsMixin, paramsEscapeMixin],
-			},
-		],
-	},
-	patchOne: {
-		method: RequestMethod.PATCH,
-		name: 'patchOne',
+	deleteOne: {
+		method: RequestMethod.DELETE,
+		name: 'deleteOne',
 		path: `:${PARAMS_RESOURCE_ID}`,
-		implementation: async function (id, body) {
-			return this.serviceMixin.patchOne({
-				route: { id },
-				body,
-			});
-		} as JsonApiController['patchOne'],
+		implementation: JsonBaseController.prototype['deleteOne'],
 		parameters: [
 			{
 				property: PARAMS_RESOURCE_ID,
 				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-			{
-				property: 'data',
-				decorator: Body,
-				mixins: [bodyPatchMixin],
-			},
-		],
-	},
-	patchRelationship: {
-		method: RequestMethod.PATCH,
-		name: 'patchRelationship',
-		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
-		implementation: async function (id, relName, body) {
-			return this.serviceMixin.patchRelationship({
-				route: { id, relName },
-				body,
-			});
-		} as JsonApiController['patchRelationship'],
-		parameters: [
-			{
-				property: PARAMS_RESOURCE_ID,
-				decorator: Param,
-				mixins: [parseResourceIdMixin],
-			},
-			{
-				property: PARAMS_RELATION_NAME,
-				decorator: Param,
-				mixins: [parseRelationshipNameMixin],
-			},
-			{
-				property: 'data',
-				decorator: Body,
-				mixins: [bodyPatchRelationshipMixin],
+				mixins: [() => ParseIntPipe],
 			},
 		],
 	},
@@ -237,34 +88,59 @@ export const Bindings: BindingsConfig = {
 		method: RequestMethod.POST,
 		name: 'postOne',
 		path: '',
-		implementation: async function (body) {
-			return this.serviceMixin.postOne({
-				body,
-			});
-		} as JsonApiController['postOne'],
+		implementation: JsonBaseController.prototype['postOne'],
 		parameters: [
 			{
-				property: 'data',
 				decorator: Body,
-				mixins: [bodyPostMixin],
+				mixins: [bodyInputPostMixin],
 			},
 		],
 	},
-	postRelationship: {
-		method: RequestMethod.POST,
-		name: 'postRelationship',
-		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
-		implementation: async function (id, relName, body) {
-			return this.serviceMixin.postRelationship({
-				route: { id, relName },
-				body,
-			});
-		} as JsonApiController['postRelationship'],
+	patchOne: {
+		method: RequestMethod.PATCH,
+		name: 'patchOne',
+		path: `:${PARAMS_RESOURCE_ID}`,
+		implementation: JsonBaseController.prototype['patchOne'],
 		parameters: [
 			{
 				property: PARAMS_RESOURCE_ID,
 				decorator: Param,
-				mixins: [parseResourceIdMixin],
+				mixins: [() => ParseIntPipe],
+			},
+			{
+				decorator: Body,
+				mixins: [bodyInputPatchPipeMixin],
+			},
+		],
+	},
+	getRelationship: {
+		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
+		name: 'getRelationship',
+		method: RequestMethod.GET,
+		implementation: JsonBaseController.prototype['getRelationship'],
+		parameters: [
+			{
+				property: PARAMS_RESOURCE_ID,
+				decorator: Param,
+				mixins: [() => ParseIntPipe],
+			},
+			{
+				property: PARAMS_RELATION_NAME,
+				decorator: Param,
+				mixins: [parseRelationshipNameMixin],
+			},
+		],
+	},
+	deleteRelationship: {
+		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
+		name: 'deleteRelationship',
+		method: RequestMethod.DELETE,
+		implementation: JsonBaseController.prototype['deleteRelationship'],
+		parameters: [
+			{
+				property: PARAMS_RESOURCE_ID,
+				decorator: Param,
+				mixins: [() => ParseIntPipe],
 			},
 			{
 				property: PARAMS_RELATION_NAME,
@@ -272,15 +148,65 @@ export const Bindings: BindingsConfig = {
 				mixins: [parseRelationshipNameMixin],
 			},
 			{
-				property: 'data',
 				decorator: Body,
-				mixins: [bodyPostRelationshipMixin],
+				mixins: [bodyRelationshipPipeMixin],
+			},
+		],
+	},
+	postRelationship: {
+		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
+		name: 'postRelationship',
+		method: RequestMethod.POST,
+		implementation: JsonBaseController.prototype['postRelationship'],
+		parameters: [
+			{
+				property: PARAMS_RESOURCE_ID,
+				decorator: Param,
+				mixins: [() => ParseIntPipe],
+			},
+			{
+				property: PARAMS_RELATION_NAME,
+				decorator: Param,
+				mixins: [parseRelationshipNameMixin],
+			},
+			{
+				decorator: Body,
+				mixins: [bodyRelationshipPipeMixin],
+			},
+		],
+	},
+	patchRelationship: {
+		path: `:${PARAMS_RESOURCE_ID}/relationships/:${PARAMS_RELATION_NAME}`,
+		name: 'patchRelationship',
+		method: RequestMethod.PATCH,
+		implementation: JsonBaseController.prototype['patchRelationship'],
+		parameters: [
+			{
+				property: PARAMS_RESOURCE_ID,
+				decorator: Param,
+				mixins: [() => ParseIntPipe],
+			},
+			{
+				property: PARAMS_RELATION_NAME,
+				decorator: Param,
+				mixins: [parseRelationshipNameMixin],
+			},
+			{
+				decorator: Body,
+				mixins: [bodyRelationshipPatchPipeMixin],
 			},
 		],
 	},
 };
 
-export function excludeMethod(names: Array<Partial<MethodName>>): Array<MethodName> {
+export { Bindings };
+
+export function excludeMethod(
+	names: Array<Partial<MethodName>>
+): Array<MethodName> {
 	const tmpObject = names.reduce((acum, key) => ((acum[key] = true), acum), {});
-	return Object.keys(Bindings).filter((method) => !tmpObject[method]) as Array<MethodName>;
+
+	return Object.keys(Bindings).filter(
+		(method) => !tmpObject[method]
+	) as Array<MethodName>;
 }

@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"rootDir": ".",
 		"sourceMap": false,
-		"declaration": true,
+		"declaration": false,
 		"moduleResolution": "node",
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
@@ -13,6 +13,7 @@
 		"lib": ["es2018", "dom"],
 		"skipLibCheck": true,
 		"skipDefaultLibCheck": true,
+		"strictBindCallApply": true,
 		"resolveJsonModule": true,
 		"baseUrl": "."
 	},
